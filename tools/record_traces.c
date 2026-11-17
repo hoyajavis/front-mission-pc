@@ -116,12 +116,14 @@ int main(int argc, char **argv) {
         tap_button(snes, tr, FM_BTN_A, 4, 240); /* Dismiss Pilot Name Confirmation splash */
         save_snapshot(snes, pixels, "traces/snapshots/jp_02a_new_game.ppm");
 
-        /* Name Entry screen: START confirms the default name -> wait 240 frames for Call Sign fade-in */
-        tap_button(snes, tr, FM_BTN_START, 6, 240);
+        /* Name Entry screen: START confirms the default name -> wait past Confirmation splash */
+        tap_button(snes, tr, FM_BTN_START, 6, 300);
+        tap_button(snes, tr, FM_BTN_A, 4, 300);
+        save_snapshot(snes, pixels, "traces/snapshots/jp_02a_callsign.ppm");
         /* Call Sign screen: navigate DOWN x4, RIGHT x11 to 'End' and press A */
-        for (int i = 0; i < 4; ++i) tap_button(snes, tr, FM_BTN_DOWN, 4, 10);
-        for (int i = 0; i < 11; ++i) tap_button(snes, tr, FM_BTN_RIGHT, 4, 10);
-        tap_button(snes, tr, FM_BTN_A, 6, 60);
+        for (int i = 0; i < 4; ++i) tap_button(snes, tr, FM_BTN_DOWN, 6, 15);
+        for (int i = 0; i < 11; ++i) tap_button(snes, tr, FM_BTN_RIGHT, 6, 15);
+        tap_button(snes, tr, FM_BTN_A, 6, 120);
 
         /* Advance through opening Larcus District prologue dialogue with steady A cadence */
         for (int i = 0; i < 300; ++i) {
@@ -182,10 +184,11 @@ int main(int argc, char **argv) {
         tap_button(snes, tr, FM_BTN_A, 4, 60);
         tap_button(snes, tr, FM_BTN_A, 4, 300);
         tap_button(snes, tr, FM_BTN_A, 4, 300);
-        tap_button(snes, tr, FM_BTN_START, 6, 240);
-        for (int i = 0; i < 4; ++i) tap_button(snes, tr, FM_BTN_DOWN, 4, 10);
-        for (int i = 0; i < 11; ++i) tap_button(snes, tr, FM_BTN_RIGHT, 4, 10);
-        tap_button(snes, tr, FM_BTN_A, 6, 60);
+        tap_button(snes, tr, FM_BTN_START, 6, 300);
+        tap_button(snes, tr, FM_BTN_A, 4, 300);
+        for (int i = 0; i < 4; ++i) tap_button(snes, tr, FM_BTN_DOWN, 6, 15);
+        for (int i = 0; i < 11; ++i) tap_button(snes, tr, FM_BTN_RIGHT, 6, 15);
+        tap_button(snes, tr, FM_BTN_A, 6, 120);
         for (int i = 0; i < 80; ++i) {
             tap_button(snes, tr, FM_BTN_A, 3, 12);
         }
