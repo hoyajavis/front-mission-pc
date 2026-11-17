@@ -23,21 +23,13 @@
 #include <string.h>
 
 extern bool (*g_cpuRecompHook)(Cpu *);
-extern void snesrecomp_set_snes(Snes *snes);
 extern void fm_recomp_register_all(bool with_intercept, bool with_validate);
 extern size_t fm_recomp_count(void);
 
-/* Stubs required by libsnesrecomp.a */
-void platform_set_headless(const char *record_path) { (void)record_path; }
-bool platform_is_headless(void) { return true; }
-bool platform_init(const char *window_title, int scale) { (void)window_title; (void)scale; return true; }
-void platform_present_frame(const uint8_t *framebuffer) { (void)framebuffer; }
-void platform_queue_audio(const int16_t *samples, int sample_count) { (void)samples; (void)sample_count; }
-bool platform_poll_events(void) { return true; }
-void platform_frame_sync(void) {}
-void platform_request_screenshot(void) {}
-bool platform_mouse_to_snes(int *x, int *y) { (void)x; (void)y; return false; }
-void platform_shutdown(void) {}
+static Snes *s_cand_snes = NULL;
+Snes *snesrecomp_get_snes(void) { return s_cand_snes; }
+bool g_recomp_validating = false;
+bool g_recomp_frame_touched = false;
 
 int main(int argc, char **argv) {
     if (argc < 4) {
@@ -117,7 +109,7 @@ int main(int argc, char **argv) {
 
         /* Step Candidate (Recomp Core) */
         cand_snes->input1->currentState = btn;
-        snesrecomp_set_snes(cand_snes);
+        s_cand_snes = cand_snes;
         recomp_timed_recomp_enable();
         snes_runFrame(cand_snes);
         recomp_timed_recomp_disable();

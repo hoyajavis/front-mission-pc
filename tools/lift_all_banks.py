@@ -33,8 +33,10 @@ def main():
     bank_entries = collections.defaultdict(list)
     total_manifest = 0
     with open(manifest_path, "r") as f:
-        for line in f:
-            line = line.split("#")[0].strip()
+        for raw_line in f:
+            m_hits = re.search(r"hits=(\d+)", raw_line)
+            hits = int(m_hits.group(1)) if m_hits else 0
+            line = raw_line.split("#")[0].strip()
             if not line:
                 continue
             parts = line.split()
@@ -44,7 +46,7 @@ def main():
             P = int(parts[1], 16)
             is_long = (parts[2].upper() == "JSL")
             bank = (addr24 >> 16) & 0xFF
-            bank_entries[bank].append((addr24, P, is_long))
+            bank_entries[bank].append((addr24, P, is_long, hits))
             total_manifest += 1
 
     print(f"Total routines in manifest: {total_manifest} across {len(bank_entries)} banks")
@@ -57,7 +59,7 @@ def main():
     skipped = {}
 
     for bank in sorted(bank_entries.keys()):
-        for addr24, P, is_long in bank_entries[bank]:
+        for addr24, P, is_long, hits in bank_entries[bank]:
             if bank in EXCLUDED_BANKS or addr24 in EXCLUDED_ROUTINES:
                 skipped[addr24] = "system/NMI/IRQ/DMA bank (executes genuine on LakeSnes)"
                 continue
@@ -90,6 +92,7 @@ def main():
                 candidates[addr24] = {
                     "bank": bank,
                     "is_long": is_long,
+                    "hits": hits,
                     "code": code,
                     "targets": targets,
                 }
@@ -146,7 +149,6 @@ def main():
             for addr24, is_long, _ in done:
                 is_long_str = "true" if is_long else "false"
                 f.write(f"    func_table_register(0x{addr24:06X}u, gen_{addr24:06X});\n")
-                f.write(f"    if (with_intercept) recomp_timed_add_intercept(0x{addr24:06X}u, {is_long_str});\n")
                 f.write(f"    if (with_validate) recomp_timed_add_validate(0x{addr24:06X}u, {is_long_str});\n")
             f.write("}\n")
 
@@ -156,6 +158,7 @@ def main():
     with open(header_path, "w", newline="\n") as f:
         f.write("#ifndef FM_RECOMP_H\n#define FM_RECOMP_H\n\n")
         f.write("#include <stdbool.h>\n")
+        f.write("#include <stddef.h>\n")
         f.write("#include <stdint.h>\n")
         f.write("#include <snesrecomp/func_table.h>\n\n")
         f.write("#ifdef __cplusplus\nextern \"C\" {\n#endif\n\n")
@@ -169,6 +172,10 @@ def main():
 
     all_c_path = os.path.join(out_dir, "fm_recomp_all.c")
     all_addrs = sorted(candidates.keys())
+    top_intercepts = sorted(
+        [(a, c["is_long"], c["hits"]) for a, c in candidates.items()],
+        key=lambda x: (-x[2], x[0])
+    )[:128]
     with open(all_c_path, "w", newline="\n") as f:
         f.write("/* Master recompiled function dispatcher registration for Front Mission */\n")
         f.write('#include "fm_recomp.h"\n\n')
@@ -182,7 +189,12 @@ def main():
         f.write("const uint32_t *fm_recomp_addrs(void) { return s_lifted_addrs; }\n\n")
         f.write("void fm_recomp_register_all(bool with_intercept, bool with_validate) {\n")
         for bank in active_banks:
-            f.write(f"    fm_gen_register_bank_{bank:02X}(with_intercept, with_validate);\n")
+            f.write(f"    fm_gen_register_bank_{bank:02X}(false, with_validate);\n")
+        f.write("    if (with_intercept) {\n")
+        for a, is_long, hits in top_intercepts:
+            is_long_str = "true" if is_long else "false"
+            f.write(f"        recomp_timed_add_intercept(0x{a:06X}u, {is_long_str}); /* hits={hits} */\n")
+        f.write("    }\n")
         f.write("}\n")
 
     print("\n=======================================================")
