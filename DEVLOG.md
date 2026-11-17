@@ -23,3 +23,18 @@
 - Verified all 139 lifted routines in lockstep validation across 24,737 JP frames (0 register/M-X/VRAM/CGRAM/OAM/SRAM errors) and verified `en_trace_01_boot_vwf.fmrec` (3,431 frames, 0-byte drift with patch eviction).
 - Verified `ctest` (`test_boot_loader` and `test_replay_and_eviction`, 2/2 passed under ASan/UBSan + `-Wall -Wextra -Werror`).
 
+## 2026-11-16 — Phase 2 (Gate 2) Complete
+- Mapped core WRAM addresses via `tools/wram_probe.c` against `jp_trace_04_mission1_combat.fmrec` and `src/gen/fm_bank_C1.c`:
+  - Tactical cursor screen coordinates: `$7E:02A0` (X), `$7E:02A2` (Y)
+  - Camera scroll mirrors: `$7E:02AE/$02B0` (target), `$7E:0D72..$0D7C` (BG1–BG3 H/V), `$7E:0D8A..$0D94` (shadow mirrors)
+  - Menu cursor index & mirror: `$7E:0334`, `$7E:0366`
+  - Joypad held/pressed/released: `$7E:0DC8..$0DD3`
+  - Active unit structs (`$7E:D580`, `$7E:D60D`, stride `0x8D`) & inventory (`$7E:CF80–$7E:D1FF`)
+- Created non-breaking `FmWramOverlay` C union (`include/fm_wram.h`) with compile-time `_Static_assert` offset verification.
+- Implemented Three-Pillar Direct-State Mouse Input (`include/input.h`, `src/engine/input.c`) and wired into `src/main.c`:
+  - Aspect-correct `4:3` and `16:9` (`800×448` with `144px` wings) coordinate transform (`fm_input_window_to_snes`)
+  - Pillar 1: Isometric `32×16` tile projection + direct WRAM cursor write + Right/Middle-drag camera pan
+  - Pillar 2: Deterministic 2D bounding-box menu hit-testing + direct menu slot write + Left/Right-click `A`/`B` injection
+  - Pillar 3: Instant zero-invasion yield when mouse is stationary (0-byte WRAM mutation)
+- Verified `ctest` (`test_boot_loader`, `test_replay_and_eviction`, `Gate2MouseTest` — 3/3 passed under `-Wall -Wextra -Werror` + ASan/UBSan).
+
