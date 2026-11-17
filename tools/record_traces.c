@@ -165,37 +165,78 @@ int main(int argc, char **argv) {
         fm_replay_save(tr, "traces/jp_trace_03_mission1_tactical.fmrec");
         printf("[TRACE] Saved traces/jp_trace_03_mission1_tactical.fmrec (%u frames)\n", tr->header.frame_count);
 
+        /* 4. JP Trace 04: Continue Mission 1 into Lloyd's turn, Unit Menu, Move & Combat */
+        for (int i = 0; i < 180; ++i) {
+            tap_button(snes, tr, FM_BTN_A, 3, 12);
+        }
+        /* Move cursor to Lloyd's unit, select Move/Action, open unit menu */
+        tap_button(snes, tr, FM_BTN_A, 4, 30);
+        save_snapshot(snes, pixels, "traces/snapshots/jp_04a_unit_action.ppm");
+        tap_button(snes, tr, FM_BTN_A, 4, 30);
+        tap_button(snes, tr, FM_BTN_UP, 4, 15);
+        tap_button(snes, tr, FM_BTN_RIGHT, 4, 15);
+        tap_button(snes, tr, FM_BTN_A, 4, 45);
+        for (int i = 0; i < 40; ++i) {
+            tap_button(snes, tr, FM_BTN_A, 3, 15);
+        }
+        save_snapshot(snes, pixels, "traces/snapshots/jp_04b_combat.ppm");
+
+        fm_replay_save(tr, "traces/jp_trace_04_mission1_combat.fmrec");
+        printf("[TRACE] Saved traces/jp_trace_04_mission1_combat.fmrec (%u frames)\n", tr->header.frame_count);
+
         fm_replay_free(tr);
         snes_free(snes);
         fm_boot_free_result(&res);
     }
 
-    /* 4. EN Trace 01: English + Addendum v1.03 Boot -> Title -> VWF Prologue */
+    /* 5. EN Trace 01: English + Addendum v1.03 Boot -> Title -> VWF Prologue */
     {
         FmBootResult res;
         Snes *snes = init_snes_profile(rom_path, patches_dir, FM_PROFILE_EN_ADDENDUM_103, &res);
         if (!snes) { free(pixels); return 1; }
-        FmReplayTrace *tr = fm_replay_create(FM_PROFILE_EN_ADDENDUM_103, res.crc32, 4096);
+        FmReplayTrace *tr = fm_replay_create(FM_PROFILE_EN_ADDENDUM_103, res.crc32, 16384);
 
-        run_frames(snes, tr, FM_BTN_NONE, 200);
-        tap_button(snes, tr, FM_BTN_START, 4, 180);
-        tap_button(snes, tr, FM_BTN_START, 4, 120);
+        run_frames(snes, tr, FM_BTN_NONE, 260);
+        tap_button(snes, tr, FM_BTN_START, 6, 200);
+        tap_button(snes, tr, FM_BTN_START, 6, 200);
         save_snapshot(snes, pixels, "traces/snapshots/en_01a_title.ppm");
-        tap_button(snes, tr, FM_BTN_A, 4, 60);
-        tap_button(snes, tr, FM_BTN_A, 4, 300);
-        tap_button(snes, tr, FM_BTN_A, 4, 300);
+        tap_button(snes, tr, FM_BTN_A, 6, 90);
+        tap_button(snes, tr, FM_BTN_A, 6, 260);
+        tap_button(snes, tr, FM_BTN_A, 6, 260);
+        /* Name Entry: press START to confirm default name 'Lloyd', then A on confirmation */
         tap_button(snes, tr, FM_BTN_START, 6, 300);
-        tap_button(snes, tr, FM_BTN_A, 4, 300);
+        tap_button(snes, tr, FM_BTN_A, 6, 300);
+        /* Call Sign: DOWN x4, RIGHT x11 to 'End', press A */
         for (int i = 0; i < 4; ++i) tap_button(snes, tr, FM_BTN_DOWN, 6, 15);
         for (int i = 0; i < 11; ++i) tap_button(snes, tr, FM_BTN_RIGHT, 6, 15);
-        tap_button(snes, tr, FM_BTN_A, 6, 120);
-        for (int i = 0; i < 80; ++i) {
+        tap_button(snes, tr, FM_BTN_A, 6, 180);
+        for (int i = 0; i < 180; ++i) {
             tap_button(snes, tr, FM_BTN_A, 3, 12);
         }
         save_snapshot(snes, pixels, "traces/snapshots/en_01b_vwf_prologue.ppm");
 
         fm_replay_save(tr, "traces/en_trace_01_boot_vwf.fmrec");
         printf("[TRACE] Saved traces/en_trace_01_boot_vwf.fmrec (%u frames)\n", tr->header.frame_count);
+
+        fm_replay_free(tr);
+        snes_free(snes);
+        fm_boot_free_result(&res);
+    }
+
+    /* 6. EN Trace 02: English F.H. v1.0b Boot -> Title */
+    {
+        FmBootResult res;
+        Snes *snes = init_snes_profile(rom_path, patches_dir, FM_PROFILE_EN_FH_10B, &res);
+        if (!snes) { free(pixels); return 1; }
+        FmReplayTrace *tr = fm_replay_create(FM_PROFILE_EN_FH_10B, res.crc32, 1024);
+
+        run_frames(snes, tr, FM_BTN_NONE, 260);
+        tap_button(snes, tr, FM_BTN_START, 6, 200);
+        tap_button(snes, tr, FM_BTN_START, 6, 200);
+        save_snapshot(snes, pixels, "traces/snapshots/en_02_fh10b_title.ppm");
+
+        fm_replay_save(tr, "traces/en_trace_02_fh10b_boot.fmrec");
+        printf("[TRACE] Saved traces/en_trace_02_fh10b_boot.fmrec (%u frames)\n", tr->header.frame_count);
 
         fm_replay_free(tr);
         snes_free(snes);
