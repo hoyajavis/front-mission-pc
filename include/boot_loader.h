@@ -101,6 +101,12 @@ void fm_boot_free_result(FmBootResult *result);
 /* Human-readable name for FmBootProfileId */
 const char *fm_boot_profile_name(FmBootProfileId profile);
 
+/* Map a 24-bit SNES HiROM address to a linear ROM file offset */
+bool fm_hirom_addr_to_offset(uint32_t snes_addr, size_t rom_size, uint32_t *out_offset);
+
+/* Return true if [offset, offset + length) overlaps any modified patch range */
+bool fm_patch_range_overlaps(const FmPatchRange *ranges, size_t range_count, uint32_t offset, uint32_t length);
+
 #ifdef __cplusplus
 }
 #endif

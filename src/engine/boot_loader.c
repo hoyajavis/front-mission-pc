@@ -674,3 +674,43 @@ void fm_boot_free_result(FmBootResult *result) {
     free(result->modified_ranges);
     memset(result, 0, sizeof(*result));
 }
+
+bool fm_hirom_addr_to_offset(uint32_t snes_addr, size_t rom_size, uint32_t *out_offset) {
+    uint8_t bank = (uint8_t)((snes_addr >> 16) & 0xFFu);
+    uint16_t addr16 = (uint16_t)(snes_addr & 0xFFFFu);
+
+    if (bank == 0x7Eu || bank == 0x7Fu) {
+        return false;
+    }
+    if ((bank < 0x40u || (bank >= 0x80u && bank < 0xC0u)) && addr16 < 0x8000u) {
+        return false;
+    }
+
+    uint32_t offset = ((uint32_t)(bank & 0x3Fu) << 16) | (uint32_t)addr16;
+    if (rom_size == 3u * 1024u * 1024u && offset >= 0x300000u) {
+        offset = 0x200000u + (offset & 0xFFFFFu);
+    }
+    if (offset >= rom_size) {
+        return false;
+    }
+    if (out_offset) {
+        *out_offset = offset;
+    }
+    return true;
+}
+
+bool fm_patch_range_overlaps(const FmPatchRange *ranges, size_t range_count, uint32_t offset, uint32_t length) {
+    if (!ranges || range_count == 0 || length == 0) {
+        return false;
+    }
+    uint64_t a0 = (uint64_t)offset;
+    uint64_t a1 = a0 + (uint64_t)length;
+    for (size_t i = 0; i < range_count; ++i) {
+        uint64_t b0 = (uint64_t)ranges[i].offset;
+        uint64_t b1 = b0 + (uint64_t)ranges[i].length;
+        if (a0 < b1 && b0 < a1) {
+            return true;
+        }
+    }
+    return false;
+}

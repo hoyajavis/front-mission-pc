@@ -25,6 +25,7 @@
 extern bool (*g_cpuRecompHook)(Cpu *);
 extern void fm_recomp_register_all(bool with_intercept, bool with_validate);
 extern size_t fm_recomp_count(void);
+extern const uint32_t *fm_recomp_addrs(void);
 
 static Snes *s_cand_snes = NULL;
 Snes *snesrecomp_get_snes(void) { return s_cand_snes; }
@@ -87,16 +88,31 @@ int main(int argc, char **argv) {
     func_table_init();
     recomp_interp_set_enabled(true);
 
-    /* Only register JP-lifted routines if no patch modified the ROM (or future: per-range eviction) */
-    if (boot_res.modified_range_count == 0) {
+    /* Register JP-lifted routines, evicting any routine whose ROM bytes overlap a patch */
+    if (boot_res.modified_range_count >= FM_MAX_PATCH_RANGES) {
+        printf("[PATCH EVICTION] %zu modified ranges (table saturated); evicting all JP-lifted routines for patched profile.\n",
+               boot_res.modified_range_count);
+    } else {
         if (validate_only) {
             fm_recomp_register_all(false, true);
         } else {
             fm_recomp_register_all(true, false);
         }
-    } else {
-        printf("[PATCH EVICTION] %zu modified ranges detected; evicting lifted routines for patched profile.\n",
-               boot_res.modified_range_count);
+        if (boot_res.modified_range_count > 0) {
+            const uint32_t *addrs = fm_recomp_addrs();
+            size_t count = fm_recomp_count();
+            size_t evicted = 0;
+            for (size_t i = 0; i < count; ++i) {
+                uint32_t off = 0;
+                if (!fm_hirom_addr_to_offset(addrs[i], boot_res.rom_size, &off) ||
+                    fm_patch_range_overlaps(boot_res.modified_ranges, boot_res.modified_range_count, off, 256u)) {
+                    func_table_register(addrs[i], NULL);
+                    evicted++;
+                }
+            }
+            printf("[PATCH EVICTION] %zu modified ranges: evicted %zu / %zu lifted routines.\n",
+                   boot_res.modified_range_count, evicted, count);
+        }
     }
 
     for (uint32_t f = 0; f < trace->header.frame_count; ++f) {

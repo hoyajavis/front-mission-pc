@@ -161,3 +161,12 @@ if(NOT MSVC)
     target_compile_options(test_boot_loader PRIVATE -Wall -Wextra -Werror -O2 ${FM_SANITIZER_FLAGS})
 endif()
 add_test(NAME test_boot_loader COMMAND test_boot_loader)
+
+add_executable(test_replay_and_eviction
+    tests/test_replay_and_eviction.c
+)
+target_link_libraries(test_replay_and_eviction PRIVATE fm_engine)
+if(NOT MSVC)
+    target_compile_options(test_replay_and_eviction PRIVATE -Wall -Wextra -Werror -O2 ${FM_SANITIZER_FLAGS})
+endif()
+add_test(NAME test_replay_and_eviction COMMAND test_replay_and_eviction)
