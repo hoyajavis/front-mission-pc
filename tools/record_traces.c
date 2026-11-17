@@ -116,8 +116,8 @@ int main(int argc, char **argv) {
         tap_button(snes, tr, FM_BTN_A, 4, 240); /* Dismiss Pilot Name Confirmation splash */
         save_snapshot(snes, pixels, "traces/snapshots/jp_02a_new_game.ppm");
 
-        /* Name Entry screen: START confirms the default name -> Call Sign screen */
-        tap_button(snes, tr, FM_BTN_START, 6, 120);
+        /* Name Entry screen: START confirms the default name -> wait 240 frames for Call Sign fade-in */
+        tap_button(snes, tr, FM_BTN_START, 6, 240);
         /* Call Sign screen: navigate DOWN x4, RIGHT x11 to 'End' and press A */
         for (int i = 0; i < 4; ++i) tap_button(snes, tr, FM_BTN_DOWN, 4, 10);
         for (int i = 0; i < 11; ++i) tap_button(snes, tr, FM_BTN_RIGHT, 4, 10);
@@ -180,9 +180,9 @@ int main(int argc, char **argv) {
         tap_button(snes, tr, FM_BTN_START, 4, 120);
         save_snapshot(snes, pixels, "traces/snapshots/en_01a_title.ppm");
         tap_button(snes, tr, FM_BTN_A, 4, 60);
-        tap_button(snes, tr, FM_BTN_A, 4, 240);
         tap_button(snes, tr, FM_BTN_A, 4, 300);
-        tap_button(snes, tr, FM_BTN_START, 6, 120);
+        tap_button(snes, tr, FM_BTN_A, 4, 300);
+        tap_button(snes, tr, FM_BTN_START, 6, 240);
         for (int i = 0; i < 4; ++i) tap_button(snes, tr, FM_BTN_DOWN, 4, 10);
         for (int i = 0; i < 11; ++i) tap_button(snes, tr, FM_BTN_RIGHT, 4, 10);
         tap_button(snes, tr, FM_BTN_A, 6, 60);
