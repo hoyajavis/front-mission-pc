@@ -105,7 +105,7 @@ static bool on_cpu_opcode_hook(Cpu *cpu) {
             flags |= CDL_SUB_ENTRY;
             uint8_t p_mx = (uint8_t)((mf ? 0x20u : 0u) | (xf ? 0x10u : 0u));
             bool is_long = (s_last_opcode == 0x22);
-            record_routine_entry(normalize_hirom_addr(pb_pc), p_mx, is_long);
+            record_routine_entry(pb_pc, p_mx, is_long);
         }
 
         if (pb_pc != s_expected_next_pc && s_expected_next_pc != 0xFFFFFFFFu) {
