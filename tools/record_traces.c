@@ -118,10 +118,9 @@ int main(int argc, char **argv) {
 
         /* Name Entry screen: START confirms the default name -> Call Sign screen */
         tap_button(snes, tr, FM_BTN_START, 6, 120);
-        /* Call Sign screen: START or End (row 4, col 11) confirms */
-        tap_button(snes, tr, FM_BTN_START, 6, 60);
-        tap_button(snes, tr, FM_BTN_UP, 4, 15);
-        tap_button(snes, tr, FM_BTN_LEFT, 4, 15);
+        /* Call Sign screen: navigate DOWN x4, RIGHT x11 to 'End' and press A */
+        for (int i = 0; i < 4; ++i) tap_button(snes, tr, FM_BTN_DOWN, 4, 10);
+        for (int i = 0; i < 11; ++i) tap_button(snes, tr, FM_BTN_RIGHT, 4, 10);
         tap_button(snes, tr, FM_BTN_A, 6, 60);
 
         /* Advance through opening Larcus District prologue dialogue with steady A cadence */
@@ -182,11 +181,10 @@ int main(int argc, char **argv) {
         save_snapshot(snes, pixels, "traces/snapshots/en_01a_title.ppm");
         tap_button(snes, tr, FM_BTN_A, 4, 60);
         tap_button(snes, tr, FM_BTN_A, 4, 240);
-        tap_button(snes, tr, FM_BTN_A, 4, 240);
+        tap_button(snes, tr, FM_BTN_A, 4, 300);
         tap_button(snes, tr, FM_BTN_START, 6, 120);
-        tap_button(snes, tr, FM_BTN_START, 6, 60);
-        tap_button(snes, tr, FM_BTN_UP, 4, 15);
-        tap_button(snes, tr, FM_BTN_LEFT, 4, 15);
+        for (int i = 0; i < 4; ++i) tap_button(snes, tr, FM_BTN_DOWN, 4, 10);
+        for (int i = 0; i < 11; ++i) tap_button(snes, tr, FM_BTN_RIGHT, 4, 10);
         tap_button(snes, tr, FM_BTN_A, 6, 60);
         for (int i = 0; i < 80; ++i) {
             tap_button(snes, tr, FM_BTN_A, 3, 12);
