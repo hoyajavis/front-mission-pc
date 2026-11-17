@@ -63,6 +63,7 @@ add_library(fm_engine STATIC
     src/engine/boot_loader.c
     src/engine/config.c
     src/engine/gui_menu.c
+    src/engine/replay.c
     src/engine/snes_ui_rasterizer.c
 )
 target_include_directories(fm_engine PUBLIC
@@ -85,6 +86,15 @@ add_executable(fm_boot_verify
 target_link_libraries(fm_boot_verify PRIVATE fm_engine lakesnes m)
 if(NOT MSVC)
     target_compile_options(fm_boot_verify PRIVATE -Wall -Wextra -Werror -O2 ${FM_SANITIZER_FLAGS})
+endif()
+
+# Headless Phase 1 trace recorder
+add_executable(fm_record_traces
+    tools/record_traces.c
+)
+target_link_libraries(fm_record_traces PRIVATE fm_engine lakesnes m)
+if(NOT MSVC)
+    target_compile_options(fm_record_traces PRIVATE -Wall -Wextra -Werror -O2 ${FM_SANITIZER_FLAGS})
 endif()
 
 # Optional SDL2 desktop frontend

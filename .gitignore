@@ -13,8 +13,10 @@
 *.fmsav
 *.srm
 *.fmrec
+*.cdl
 
 # 2. Build Directories & Compiled Binaries
+src/gen/
 build/
 bin/
 cmake-build-*/
