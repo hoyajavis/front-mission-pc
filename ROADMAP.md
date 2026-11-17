@@ -17,5 +17,10 @@
   - [x] WRAM discovery (`tools/wram_probe.c`) & non-breaking `FmWramOverlay` (`include/fm_wram.h`)
   - [x] Three-Pillar Direct-State Mouse Input (`include/input.h`, `src/engine/input.c`, `src/main.c`)
   - [x] `Gate2MouseTest` (`tests/test_gate2_mouse.c`, 3/3 `ctest` suites passing under ASan/UBSan + `-Wall -Wextra -Werror`)
-- [ ] **Phase 3: 16:9 Widescreen & Read-Only Tactical Telemetry Wings (Gate 3)**
+- [ ] **Phase 3: 16:9 Widescreen & Read-Only Tactical Telemetry Wings (Gate 3)** *(Plan: `docs/phase3_widescreen_plan.md`)*
+  - [ ] Milestone 3.1: WRAM scene/mode & Wanzer `0x8D` struct discovery + read-only ROM stat getters (`fm_wram.h`)
+  - [ ] Milestone 3.2: Const-only telemetry extractor (`fm_telemetry.c`) with `0x55` cold-boot WRAM guard
+  - [ ] Milestone 3.3: `800×448` dual-layer compositor (`widescreen.c`) with `[F10]` mode cycle & `144×448` context-switched wings
+  - [ ] Milestone 3.4: SDL2 `main.c` `800×448` texture & `[F10]` input alignment integration
+  - [ ] Milestone 3.5: `Gate3TelemetryZeroInvasionTest`, `Gate3Widescreen16x9Test`, and headless `.ppm` visual QA
 - [ ] **Phase 4: Polish, QoL & Cross-Platform Release (Gate 4)**
