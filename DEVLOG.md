@@ -24,6 +24,7 @@
 - Verified `ctest` (`test_boot_loader` and `test_replay_and_eviction`, 2/2 passed under ASan/UBSan + `-Wall -Wextra -Werror`).
 
 ## 2026-11-16 — Phase 2 (Gate 2) Complete
+- Detailed step-by-step documentation archived in `docs/phase2_wram_and_mouse.md`.
 - Mapped core WRAM addresses via `tools/wram_probe.c` against `jp_trace_04_mission1_combat.fmrec` and `src/gen/fm_bank_C1.c`:
   - Tactical cursor screen coordinates: `$7E:02A0` (X), `$7E:02A2` (Y)
   - Camera scroll mirrors: `$7E:02AE/$02B0` (target), `$7E:0D72..$0D7C` (BG1–BG3 H/V), `$7E:0D8A..$0D94` (shadow mirrors)
