@@ -555,18 +555,49 @@ bool fm_boot_load_rom(const FmBootConfig *cfg, FmBootResult *out_result) {
             return false;
         }
 
-        bool ok = fm_apply_ips_memory(
-            rom_buf, &rom_len, FM_ROM_EN_MAX_SIZE,
-            fh_patch, fh_size,
-            ranges, FM_MAX_PATCH_RANGES, &out_result->modified_range_count,
-            out_result->error_msg, sizeof(out_result->error_msg)
-        );
-        free(fh_patch);
-        if (!ok) {
+        /* FMSNE10B.IPS (2001) targets a 512-byte SMC-headered ROM; apply at +0x200 then strip. */
+        uint8_t *hdr_buf = (uint8_t *)calloc(1, FM_ROM_EN_MAX_SIZE + 512u);
+        if (!hdr_buf) {
+            free(fh_patch);
             free(rom_buf);
             free(ranges);
             return false;
         }
+        memcpy(hdr_buf + 512u, rom_buf, rom_len);
+        size_t hdr_len = rom_len + 512u;
+
+        FmPatchRange *fh_ranges = (FmPatchRange *)calloc(FM_MAX_PATCH_RANGES, sizeof(FmPatchRange));
+        size_t fh_range_count = 0;
+        bool ok = fm_apply_ips_memory(
+            hdr_buf, &hdr_len, FM_ROM_EN_MAX_SIZE + 512u,
+            fh_patch, fh_size,
+            fh_ranges, FM_MAX_PATCH_RANGES, &fh_range_count,
+            out_result->error_msg, sizeof(out_result->error_msg)
+        );
+        free(fh_patch);
+        if (!ok || hdr_len <= 512u) {
+            free(fh_ranges);
+            free(hdr_buf);
+            free(rom_buf);
+            free(ranges);
+            return false;
+        }
+        rom_len = hdr_len - 512u;
+        memcpy(rom_buf, hdr_buf + 512u, rom_len);
+        free(hdr_buf);
+        for (size_t ri = 0; ri < fh_range_count; ++ri) {
+            uint32_t off = fh_ranges[ri].offset;
+            uint32_t len = fh_ranges[ri].length;
+            if (off + len <= 512u) continue;
+            if (off < 512u) {
+                len -= (512u - off);
+                off = 0;
+            } else {
+                off -= 512u;
+            }
+            record_range(ranges, FM_MAX_PATCH_RANGES, &out_result->modified_range_count, off, len);
+        }
+        free(fh_ranges);
 
         if (cfg->profile == FM_PROFILE_EN_ADDENDUM_103) {
             char bps_path[1024];
