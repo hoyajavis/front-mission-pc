@@ -1,0 +1,47 @@
+# ==============================================================================
+# Front Mission PC Port (.gitignore)
+# ==============================================================================
+
+# 1. Proprietary ROMs, Patches & Saves (Strict Legal Cleanliness - Rule 4)
+*.sfc
+*.smc
+*.rom
+*.bin
+*.ips
+*.bps
+*.ups
+*.fmsav
+*.srm
+*.fmrec
+
+# 2. Build Directories & Compiled Binaries
+build/
+bin/
+cmake-build-*/
+third_party/
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# 3. Test Logs, Memory Dumps & Transient Artifacts
+*.log
+*.diff
+*.ppm
+*.png
+traces/*.fmsav
+traces/*.diff
+traces/snapshots/
+
+# 4. OS, Editor Metadata & Python
+.DS_Store
+.cache/
+.vscode/
+.idea/
+*~
+__pycache__/
+*.pyc
+.gemini/
+.local/

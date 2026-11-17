@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Front Mission PC Port - Pre-Commit Quality Gate
+# Enforces Rule 4 (no ROMs/patches/saves) and configuration syntax.
+# ==============================================================================
+set -e
+
+# 1. Reject proprietary ROM binaries, patches, and save files
+if git diff --cached --name-only | grep -E '\.(sfc|smc|rom|bin|ips|bps|ups|fmsav|srm)$'; then
+    echo "ERROR: Attempted to commit a ROM, patch, or save file. Commit aborted by Rule 4." >&2
+    exit 1
+fi
+
+# 2. Reject temporary snapshot/log data
+if git diff --cached --name-only | grep -E '\.(log|diff|ppm)$'; then
+    echo "ERROR: Attempted to commit temporary snapshot/log data. Use .gitignore." >&2
+    exit 1
+fi
+
+# 3. Validate INI & JSON configuration syntax if staged
+for file in $(git diff --cached --name-only | grep -E '\.(ini|json)$' || true); do
+    if [ -f "$file" ]; then
+        python3 -c "import json, configparser; json.load(open('$file')) if '$file'.endswith('.json') else configparser.ConfigParser().read('$file')" 2>/dev/null || {
+            echo "ERROR: Syntax validation failed for staged file: $file" >&2
+            exit 1
+        }
+    fi
+done
+
+# 4. Reject machine-local file:/// URIs in staged Markdown files
+for file in $(git diff --cached --name-only | grep -E '\.md$' || true); do
+    if [ -f "$file" ] && grep -E 'file:///(home|Users)/' "$file" >/dev/null 2>&1; then
+        echo "ERROR: Machine-local file:/// URI detected in $file. Use relative repository links." >&2
+        exit 1
+    fi
+done
+
+exit 0
