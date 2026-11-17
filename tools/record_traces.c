@@ -196,21 +196,21 @@ int main(int argc, char **argv) {
         if (!snes) { free(pixels); return 1; }
         FmReplayTrace *tr = fm_replay_create(FM_PROFILE_EN_ADDENDUM_103, res.crc32, 16384);
 
-        run_frames(snes, tr, FM_BTN_NONE, 260);
-        tap_button(snes, tr, FM_BTN_START, 6, 200);
-        tap_button(snes, tr, FM_BTN_START, 6, 200);
+        run_frames(snes, tr, FM_BTN_NONE, 300);
+        tap_button(snes, tr, FM_BTN_START, 6, 240);
+        tap_button(snes, tr, FM_BTN_START, 6, 360);
         save_snapshot(snes, pixels, "traces/snapshots/en_01a_title.ppm");
-        tap_button(snes, tr, FM_BTN_A, 6, 90);
-        tap_button(snes, tr, FM_BTN_A, 6, 260);
-        tap_button(snes, tr, FM_BTN_A, 6, 260);
+        tap_button(snes, tr, FM_BTN_A, 6, 120);
+        tap_button(snes, tr, FM_BTN_A, 6, 320);
+        tap_button(snes, tr, FM_BTN_A, 6, 320);
         /* Name Entry: press START to confirm default name 'Lloyd', then A on confirmation */
-        tap_button(snes, tr, FM_BTN_START, 6, 300);
-        tap_button(snes, tr, FM_BTN_A, 6, 300);
+        tap_button(snes, tr, FM_BTN_START, 6, 360);
+        tap_button(snes, tr, FM_BTN_A, 6, 360);
         /* Call Sign: DOWN x4, RIGHT x11 to 'End', press A */
         for (int i = 0; i < 4; ++i) tap_button(snes, tr, FM_BTN_DOWN, 6, 15);
         for (int i = 0; i < 11; ++i) tap_button(snes, tr, FM_BTN_RIGHT, 6, 15);
-        tap_button(snes, tr, FM_BTN_A, 6, 180);
-        for (int i = 0; i < 180; ++i) {
+        tap_button(snes, tr, FM_BTN_A, 6, 200);
+        for (int i = 0; i < 220; ++i) {
             tap_button(snes, tr, FM_BTN_A, 3, 12);
         }
         save_snapshot(snes, pixels, "traces/snapshots/en_01b_vwf_prologue.ppm");
@@ -228,11 +228,11 @@ int main(int argc, char **argv) {
         FmBootResult res;
         Snes *snes = init_snes_profile(rom_path, patches_dir, FM_PROFILE_EN_FH_10B, &res);
         if (!snes) { free(pixels); return 1; }
-        FmReplayTrace *tr = fm_replay_create(FM_PROFILE_EN_FH_10B, res.crc32, 1024);
+        FmReplayTrace *tr = fm_replay_create(FM_PROFILE_EN_FH_10B, res.crc32, 2048);
 
-        run_frames(snes, tr, FM_BTN_NONE, 260);
-        tap_button(snes, tr, FM_BTN_START, 6, 200);
-        tap_button(snes, tr, FM_BTN_START, 6, 200);
+        run_frames(snes, tr, FM_BTN_NONE, 300);
+        tap_button(snes, tr, FM_BTN_START, 6, 240);
+        tap_button(snes, tr, FM_BTN_START, 6, 360);
         save_snapshot(snes, pixels, "traces/snapshots/en_02_fh10b_title.ppm");
 
         fm_replay_save(tr, "traces/en_trace_02_fh10b_boot.fmrec");
