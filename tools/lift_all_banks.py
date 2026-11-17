@@ -22,6 +22,9 @@ def main():
     out_dir = os.path.join(repo_root, "src/gen")
 
     os.makedirs(out_dir, exist_ok=True)
+    for fname in os.listdir(out_dir):
+        if fname.startswith("fm_bank_") and fname.endswith(".c"):
+            os.remove(os.path.join(out_dir, fname))
 
     with open(rom_path, "rb") as rf:
         data = rf.read()
@@ -52,7 +55,7 @@ def main():
     print(f"Total routines in manifest: {total_manifest} across {len(bank_entries)} banks")
 
     # Hardware / NMI / IRQ / DMA / Sound banks & routines that stay on LakeSnes interpreter
-    EXCLUDED_BANKS = {0x00, 0x80, 0xC0}
+    EXCLUDED_BANKS = {0x00, 0x80, 0xC0, 0xEA}
     EXCLUDED_ROUTINES = set()
 
     candidates = {}
