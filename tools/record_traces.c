@@ -116,8 +116,12 @@ int main(int argc, char **argv) {
         tap_button(snes, tr, FM_BTN_A, 4, 240); /* Dismiss Pilot Name Confirmation splash */
         save_snapshot(snes, pixels, "traces/snapshots/jp_02a_new_game.ppm");
 
-        /* Name Entry screen: START confirms the default name, then A */
-        tap_button(snes, tr, FM_BTN_START, 6, 45);
+        /* Name Entry screen: START confirms the default name -> Call Sign screen */
+        tap_button(snes, tr, FM_BTN_START, 6, 120);
+        /* Call Sign screen: START or End (row 4, col 11) confirms */
+        tap_button(snes, tr, FM_BTN_START, 6, 60);
+        tap_button(snes, tr, FM_BTN_UP, 4, 15);
+        tap_button(snes, tr, FM_BTN_LEFT, 4, 15);
         tap_button(snes, tr, FM_BTN_A, 6, 60);
 
         /* Advance through opening Larcus District prologue dialogue with steady A cadence */
@@ -179,7 +183,10 @@ int main(int argc, char **argv) {
         tap_button(snes, tr, FM_BTN_A, 4, 60);
         tap_button(snes, tr, FM_BTN_A, 4, 240);
         tap_button(snes, tr, FM_BTN_A, 4, 240);
-        tap_button(snes, tr, FM_BTN_START, 6, 45);
+        tap_button(snes, tr, FM_BTN_START, 6, 120);
+        tap_button(snes, tr, FM_BTN_START, 6, 60);
+        tap_button(snes, tr, FM_BTN_UP, 4, 15);
+        tap_button(snes, tr, FM_BTN_LEFT, 4, 15);
         tap_button(snes, tr, FM_BTN_A, 6, 60);
         for (int i = 0; i < 80; ++i) {
             tap_button(snes, tr, FM_BTN_A, 3, 12);
