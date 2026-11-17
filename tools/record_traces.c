@@ -89,7 +89,9 @@ int main(int argc, char **argv) {
         Snes *snes = init_snes_profile(rom_path, patches_dir, FM_PROFILE_JP_ORIGINAL, &res);
         if (!snes) { free(pixels); return 1; }
         FmReplayTrace *tr = fm_replay_create(FM_PROFILE_JP_ORIGINAL, res.crc32, 1024);
-        run_frames(snes, tr, FM_BTN_NONE, 480);
+        run_frames(snes, tr, FM_BTN_NONE, 200);
+        tap_button(snes, tr, FM_BTN_START, 4, 180);
+        tap_button(snes, tr, FM_BTN_START, 4, 180);
         save_snapshot(snes, pixels, "traces/snapshots/jp_01_title.ppm");
         fm_replay_save(tr, "traces/jp_trace_01_boot_title.fmrec");
         printf("[TRACE] Saved traces/jp_trace_01_boot_title.fmrec (%u frames)\n", tr->header.frame_count);
@@ -98,28 +100,33 @@ int main(int argc, char **argv) {
         fm_boot_free_result(&res);
     }
 
-    /* 2. JP Trace 02: Boot -> Title -> New Game -> Opening Cutscene -> Mission 1 */
+    /* 2. JP Trace 02: Boot -> Title -> New Game -> Name Confirm -> Opening Cutscene -> Mission 1 */
     {
         FmBootResult res;
         Snes *snes = init_snes_profile(rom_path, patches_dir, FM_PROFILE_JP_ORIGINAL, &res);
         if (!snes) { free(pixels); return 1; }
-        FmReplayTrace *tr = fm_replay_create(FM_PROFILE_JP_ORIGINAL, res.crc32, 8192);
+        FmReplayTrace *tr = fm_replay_create(FM_PROFILE_JP_ORIGINAL, res.crc32, 16384);
 
-        /* Wait through boot logos to title screen */
-        run_frames(snes, tr, FM_BTN_NONE, 450);
-        /* Press Start / A to enter title menu and select New Game */
-        tap_button(snes, tr, FM_BTN_START, 4, 40);
-        tap_button(snes, tr, FM_BTN_A, 4, 40);
-        tap_button(snes, tr, FM_BTN_A, 4, 40);
+        /* Skip intro to title screen, select New Game */
+        run_frames(snes, tr, FM_BTN_NONE, 200);
+        tap_button(snes, tr, FM_BTN_START, 4, 180);
+        tap_button(snes, tr, FM_BTN_START, 4, 120);
+        tap_button(snes, tr, FM_BTN_A, 4, 60); /* Title: Start / New Game */
+        tap_button(snes, tr, FM_BTN_A, 4, 120); /* Confirm New Game */
         save_snapshot(snes, pixels, "traces/snapshots/jp_02a_new_game.ppm");
 
+        /* Name Entry screen: press START to jump to End / confirm default name, then A */
+        tap_button(snes, tr, FM_BTN_START, 4, 30);
+        tap_button(snes, tr, FM_BTN_A, 4, 30);
+        tap_button(snes, tr, FM_BTN_A, 4, 60);
+
         /* Advance through opening Larcus District prologue dialogue with steady A cadence */
-        for (int i = 0; i < 260; ++i) {
+        for (int i = 0; i < 300; ++i) {
             tap_button(snes, tr, FM_BTN_A, 3, 12);
         }
         save_snapshot(snes, pixels, "traces/snapshots/jp_02b_prologue_mid.ppm");
 
-        for (int i = 0; i < 200; ++i) {
+        for (int i = 0; i < 350; ++i) {
             tap_button(snes, tr, FM_BTN_A, 3, 12);
         }
         save_snapshot(snes, pixels, "traces/snapshots/jp_02c_mission1.ppm");
@@ -128,7 +135,6 @@ int main(int argc, char **argv) {
         printf("[TRACE] Saved traces/jp_trace_02_prologue_mission1.fmrec (%u frames)\n", tr->header.frame_count);
 
         /* 3. JP Trace 03: Continue into Mission 1 Tactical Grid, Menus, Movement & Combat */
-        /* Cycle units with L/R, inspect with Y/B, move cursor with D-pad, select & act */
         tap_button(snes, tr, FM_BTN_R, 4, 20);
         tap_button(snes, tr, FM_BTN_L, 4, 20);
         tap_button(snes, tr, FM_BTN_B, 4, 30);
@@ -164,14 +170,18 @@ int main(int argc, char **argv) {
         FmBootResult res;
         Snes *snes = init_snes_profile(rom_path, patches_dir, FM_PROFILE_EN_ADDENDUM_103, &res);
         if (!snes) { free(pixels); return 1; }
-        FmReplayTrace *tr = fm_replay_create(FM_PROFILE_EN_ADDENDUM_103, res.crc32, 2048);
+        FmReplayTrace *tr = fm_replay_create(FM_PROFILE_EN_ADDENDUM_103, res.crc32, 4096);
 
-        run_frames(snes, tr, FM_BTN_NONE, 450);
+        run_frames(snes, tr, FM_BTN_NONE, 200);
+        tap_button(snes, tr, FM_BTN_START, 4, 180);
+        tap_button(snes, tr, FM_BTN_START, 4, 120);
         save_snapshot(snes, pixels, "traces/snapshots/en_01a_title.ppm");
-        tap_button(snes, tr, FM_BTN_START, 4, 40);
-        tap_button(snes, tr, FM_BTN_A, 4, 40);
-        tap_button(snes, tr, FM_BTN_A, 4, 40);
-        for (int i = 0; i < 40; ++i) {
+        tap_button(snes, tr, FM_BTN_A, 4, 60);
+        tap_button(snes, tr, FM_BTN_A, 4, 120);
+        tap_button(snes, tr, FM_BTN_START, 4, 30);
+        tap_button(snes, tr, FM_BTN_A, 4, 30);
+        tap_button(snes, tr, FM_BTN_A, 4, 60);
+        for (int i = 0; i < 80; ++i) {
             tap_button(snes, tr, FM_BTN_A, 3, 12);
         }
         save_snapshot(snes, pixels, "traces/snapshots/en_01b_vwf_prologue.ppm");

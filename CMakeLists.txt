@@ -97,6 +97,16 @@ if(NOT MSVC)
     target_compile_options(fm_record_traces PRIVATE -Wall -Wextra -Werror -O2 ${FM_SANITIZER_FLAGS})
 endif()
 
+# Headless Phase 1 CDL collector & manifest generator
+add_executable(fm_cdl_collector
+    tools/cdl_collector.c
+)
+target_include_directories(fm_cdl_collector PRIVATE ${LAKESNES_DIR})
+target_link_libraries(fm_cdl_collector PRIVATE fm_engine lakesnes m)
+if(NOT MSVC)
+    target_compile_options(fm_cdl_collector PRIVATE -Wall -Wextra -Werror -O2 ${FM_SANITIZER_FLAGS})
+endif()
+
 # Optional SDL2 desktop frontend
 find_package(SDL2 QUIET)
 if(SDL2_FOUND)
